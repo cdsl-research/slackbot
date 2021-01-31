@@ -2,9 +2,8 @@
 
 オリジナルなSlackbotを開発するぞ！
 
-## Develop
+## Dev
 
-```
-nginx
-ngrok http 3000
-```
+Guide [Slack | Bolt for Python](https://slack.dev/bolt-python/tutorial/getting-started)
+
+Code [Bolt for Python](https://github.com/slackapi/bolt-python)
