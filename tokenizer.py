@@ -27,10 +27,13 @@ def tokenizer(code):
             continue
         elif kind == "ID":
             if value.upper() in ID_spec:
-                kind = value
-        # print(kind, value)
+                kind = value.upper()
+        if value[0] == "<" and value[-1] == ">":
+            value = value[1:-1]
         code_memo.append(Token(kind, value))
-    print(code_memo)
+        # print(kind, value)
+
+    # print(code_memo)
     return code_memo
 
 
@@ -39,4 +42,6 @@ sample_in = """
 """
 
 if __name__ == '__main__':
-    tokenizer(sample_in)
+    a = tokenizer(sample_in)
+    def b(x): return [x2.type for x2 in x]
+    print(b(a) == list(("USERNAME", "QR", "URL")))
