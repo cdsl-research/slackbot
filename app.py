@@ -1,22 +1,49 @@
-import logging
-logging.basicConfig(level=logging.DEBUG)
+import os
+import re
+
+from slack_bolt import App
+
+import tokenizer
 
 # Import the async app instead of the regular one
-from slack_bolt.async_app import AsyncApp
-
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-app = AsyncApp()
+app = App(
+    token=os.environ.get("SLACK_BOT_TOKEN"),
+    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+)
+
+QR_BASE_URL = "https://chart.apis.google.com/chart?chs=200x200&cht=qr&chl="
+
 
 @app.event("app_mention")
-async def event_test(body, say, logger):
-    logger.info(body)
-    await say("What's up?")
+def handle_mentions(body, say):
+    raw_message = body["event"]["text"]
+    tokenized_message = tokenizer(raw_message)
+    tokenized_message_types = [x.type for x in tokenized_message]
 
-@app.command("/hello-bolt-python")
-async def command(ack, body, respond):
-    await ack()
-    await respond(f"Hi <@{body['user_id']}>!")
+    if tokenized_message_types == ["USERNAME", "QR", "URL"]:
+        target_url = tokenized_message[2].value
+        say(
+            blocks=[
+                {
+                    "type": "image",
+                    "title": {
+                        "type": "plain_text",
+                        "text": f"QR Code of {target_url}"
+                    },
+                    "block_id": "image1",
+                    "image_url": QR_BASE_URL + target_url,
+                    "alt_text": "QR Code"
+                }
+            ],
+        )
+
+
+@ app.message("hello")
+def message_hello(message, say):
+    say(f"Hey there <@{message['user']}>!")
+
 
 if __name__ == "__main__":
-    app.start(3000)  # POST http://localhost:3000/slack/events
+    app.start(port=int(os.environ.get("PORT", 3000)))
