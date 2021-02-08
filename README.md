@@ -56,6 +56,13 @@ HTTP Requests
 POST /slack/events             200 OK 
 ```
 
+環境変数を設定する．
+
+```
+export SLACK_BOT_TOKEN="xoxb-xxx"
+export SLACK_SIGNING_SECRET="yyy"
+```
+
 SlackBotを以下のコマンドで起動する．
 
 ```
