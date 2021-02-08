@@ -12,6 +12,7 @@ def tokenizer(code):
     token_spec = [
         ("URL", r"<https?://[\w/:%#\$&\?\(\)~\.=\+\-]+>"),
         ("USERNAME", r"<@[A-Z0-9]+>"),
+        ("IPv4", r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}"),
         ("ID", r"[A-Za-z]+"),
         ('NEWLINE', r'\n'),
         ('SKIP', r'[ \t]+'),
@@ -37,11 +38,17 @@ def tokenizer(code):
     return code_memo
 
 
-sample_in = """
-<@U01LJNE6FC7> qr <https://google.com/>
-"""
-
 if __name__ == '__main__':
-    a = tokenizer(sample_in)
-    def b(x): return [x2.type for x2 in x]
-    print(b(a) == list(("USERNAME", "QR", "URL")))
+    test_patterns = [
+        {
+            "in": "<@U01LJNE6FC7> qr <https://google.com/>",
+            "out": ["USERNAME", "QR", "URL"]
+        },
+        {
+            "in": "<@C011712375>    ping     192.2.0.1",
+            "out": ["USERNAME", "PING", "IPv4"]
+        }
+    ]
+    for tp in test_patterns:
+        result = tokenizer(tp["in"])
+        assert [r.type for r in result] == tp["out"]
