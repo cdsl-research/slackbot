@@ -2,13 +2,61 @@
 
 オリジナルなSlackbotを開発するぞ！
 
-## Dev
+## 参考リンク
 
 Guide [Slack | Bolt for Python](https://slack.dev/bolt-python/tutorial/getting-started)
 
 Code [Bolt for Python](https://github.com/slackapi/bolt-python)
 
-## Dev
+## 開発ガイド
+
+### 環境
+
+- Python 3.8.5
+- WSL2 with Ubuntu 20.04
+- ngrok 2.3.35
+
+### 手順
+
+venvをつくる．
+
+```
+python -m venv env
+. env/bin/activate
+```
+
+packageをインストールする．
+
+```
+pip install -U pip
+pip install -r requirements.txt
+```
+
+ngrokをインストールする．
+
+https://ngrok.com/download
+
+ngrokでポート転送を設定する．ローカルホストの3000/tcpをngrokで外部に公開する．
+
+```
+$ ngrok http 3000
+ngrok by @inconshreveable
+Session Status                online
+Session Expires               1 hour, 51 minutes
+Version                       2.3.35
+Region                        United States (us)
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    http://ac806888c053.ngrok.io -> http://localhost:3000
+Forwarding                    https://ac806888c053.ngrok.io -> http://localhost:3000
+
+Connections                   ttl     opn     rt1     rt5     p50     p90
+                              1       0       0.00    0.00    0.01    0.01
+HTTP Requests
+
+POST /slack/events             200 OK 
+```
+
+SlackBotを以下のコマンドで起動する．
 
 ```
 $ python app.py
@@ -18,5 +66,10 @@ DEBUG:asyncio:Using selector: EpollSelector
 (Press CTRL+C to quit)
 
 # Open another tab
-$ ngrok http 3000
 ```
+
+Slack APIの設定から `Event Subscriptions` を選び，`Enable Events` にあるRequest URLにngrokで表示されたForwardingのURL(例: `https://ac806888c053.ngrok.io`)を入力する．
+
+[Slack APIの設定](https://api.slack.com/apps/A01LZEC2UG2/event-subscriptions)
+
+<img src="./dev-slack-setting.jpg" width="400">
