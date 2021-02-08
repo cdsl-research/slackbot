@@ -13,13 +13,13 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-QR_BASE_URL = "https://chart.apis.google.com/chart?chs=200x200&cht=qr&chl="
+QR_BASE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200%C3%97200&data="
 
 
 @app.event("app_mention")
 def handle_mentions(body, say):
     raw_message = body["event"]["text"]
-    tokenized_message = tokenizer(raw_message)
+    tokenized_message = tokenizer.tokenizer(raw_message)
     tokenized_message_types = [x.type for x in tokenized_message]
 
     if tokenized_message_types == ["USERNAME", "QR", "URL"]:
@@ -32,7 +32,7 @@ def handle_mentions(body, say):
                         "type": "plain_text",
                         "text": f"QR Code of {target_url}"
                     },
-                    "block_id": "image1",
+                    "block_id": f"image-{target_url}",
                     "image_url": QR_BASE_URL + target_url,
                     "alt_text": "QR Code"
                 }
