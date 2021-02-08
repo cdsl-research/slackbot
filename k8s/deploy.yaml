@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slackbot-dep
+  namespace: slackbot
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: slackbot
+  template:
+    metadata:
+      labels:
+        app: slackbot
+    spec:
+      containers:
+        - name: slackbot-container
+          image: us.gcr.io/third-ridge-246401/cdsl-slackbot:v0.1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: SLACK_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: slack-bot-token
+                  optional: false
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-secret
+                  key: slack-singing-secret
+                  optional: false
