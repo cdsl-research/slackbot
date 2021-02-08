@@ -1,5 +1,4 @@
 import os
-import re
 
 from slack_bolt import App
 
@@ -13,7 +12,8 @@ app = App(
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-QR_BASE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=200%C3%97200&data="
+QR_BASE_URL = ("https://api.qrserver.com/v1/create-qr-code/"
+               "?size=200%C3%97200&data=")
 
 
 @app.event("app_mention")
@@ -40,7 +40,7 @@ def handle_mentions(body, say):
         )
 
 
-@ app.message("hello")
+@app.message("hello")
 def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
