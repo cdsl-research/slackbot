@@ -1,4 +1,6 @@
 import os
+import random
+import json
 
 from slack_bolt import App
 
@@ -38,12 +40,32 @@ def handle_mentions(body, say):
                 }
             ],
         )
+    elif tokenized_message_types == ["USERNAME", "OMIKUJI"]:
+        with open("omikuji_result.json") as f:
+            omikuji_result = json.load(f)["omikuji"]
+        chose_result = random.choice(omikuji_result)
+        say(
+            blocks=[
+                {
+                    "type": "image",
+                    "title": {
+                        "type": "plain_text",
+                        "text": "Omikuji result " + chose_result["text"]
+                    },
+                    "block_id": "image",
+                    "image_url": chose_result["image"],
+                    "alt_text": "QR Code " + chose_result["text"]
+                }
+            ],
+        )
 
 
 @app.message("hello")
 def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
+
+# group mension
 
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
