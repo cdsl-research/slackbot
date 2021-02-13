@@ -16,9 +16,9 @@ def tokenizer(code):
         ("ID", r"[A-Za-z]+"),
         ('NEWLINE', r'\n'),
         ('SKIP', r'[ \t]+'),
-        ('MISMATCH', r'.'),
+        ('WORD', r'[^ \t]+'),
     ]
-    ID_spec = {"QR", "PING"}
+    ID_spec = {"QR", "PING", "OJI", "OMIKUJI"}
     token_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_spec)
     code_memo = []
     for mo in re.finditer(token_regex, code):
@@ -27,18 +27,27 @@ def tokenizer(code):
         if kind in ('NEWLINE', 'SKIP', 'MISMATCH'):
             continue
         elif kind == "ID":
+            # IDパターン一覧にあるか
             if value.upper() in ID_spec:
                 kind = value.upper()
-        if value[0] == "<" and value[-1] == ">":
+            else:
+                kind = "WORD"
+
+        if len(value) > 1 and value[0] == "<" and value[-1] == ">":
             value = value[1:-1]
-        code_memo.append(Token(kind, value))
+
+        # WORDの連続をまとめる
+        if len(code_memo) > 0 and code_memo[-1].type == kind == "WORD":
+            new_value = " ".join((code_memo[-1].value, value))
+            code_memo[-1] = Token(kind, new_value)
+        else:
+            code_memo.append(Token(kind, value))
         # print(kind, value)
 
-    # print(code_memo)
     return code_memo
 
 
-if __name__ == '__main__':
+def test():
     test_patterns = [
         {
             "in": "<@U01LJNE6FC7> qr <https://google.com/>",
@@ -47,8 +56,17 @@ if __name__ == '__main__':
         {
             "in": "<@C011712375>    ping     192.2.0.1",
             "out": ["USERNAME", "PING", "IPv4"]
+        },
+        {
+            "in": "<@C011712375>    oji     hello world あああ",
+            "out": ["USERNAME", "OJI", "WORD"]
         }
     ]
     for tp in test_patterns:
         result = tokenizer(tp["in"])
         assert [r.type for r in result] == tp["out"]
+
+
+if __name__ == '__main__':
+    test()
+    # t = tokenizer("あいうえお <@U01LJNE6FC7> oji あいうえお hello")
