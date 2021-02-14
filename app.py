@@ -24,6 +24,7 @@ def handle_mentions(body, say):
     raw_message = body["event"]["text"]
     tokenized_message = tokenizer.tokenizer(raw_message)
     tokenized_message_types = [x.type for x in tokenized_message]
+    print(tokenized_message)
 
     if tokenized_message_types == ["USERNAME", "QR", "URL"]:
         target_url = tokenized_message[2].value
@@ -59,7 +60,7 @@ def handle_mentions(body, say):
                 }
             ],
         )
-    elif tokenized_message_types == ["USERNAME", "gakuseki", "STUDENT_ID"]:
+    elif tokenized_message_types == ["USERNAME", "GAKUSEKI", "STUDENT_ID"]:
         students = member_list.get_members()
         student_id = tokenized_message[2].value
         the_student = students.get(student_id)
