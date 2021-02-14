@@ -4,6 +4,7 @@ import json
 
 from slack_bolt import App
 
+import member_list
 import tokenizer
 
 # Import the async app instead of the regular one
@@ -59,11 +60,34 @@ def handle_mentions(body, say):
             ],
         )
     elif tokenized_message_types == ["USERNAME", "gakuseki", "STUDENT_ID"]:
+        students = member_list.get_members()
         student_id = tokenized_message[2].value
-        student_name = ''
-        student_email = ''
+        the_student = students.get(student_id)
+        if the_student is None:
+            say("Not found.")
+        else:
+            s_email = the_student["email"]
+            s_real_name = the_student["real_name"]
+            say(blocks=[{
+                "blocks": [
+                    {
+                        "type": "section",
+                        "fields": [
+                            {
+                                "type": "plain_text",
+                                "text": f":e-mail: *Email:* {s_email}",
+                                "emoji": True
+                            },
+                            {
+                                "type": "plain_text",
+                                "text": f":pencil: *Real Name:* {s_real_name}",
+                                "emoji": True
+                            }
+                        ]
+                    }
+                ]
+            }])
 
-        
 
 @app.message("hello")
 def message_hello(message, say):
