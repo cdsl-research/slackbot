@@ -13,12 +13,14 @@ def tokenizer(code):
         ("URL", r"<https?://[\w/:%#\$&\?\(\)~\.=\+\-]+>"),
         ("USERNAME", r"<@[A-Z0-9]+>"),
         ("IPv4", r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}"),
+        ("STUDENT_ID", r"C0[a-z0-9]{6}"),
+        # これ以下は一般パターン
         ("ID", r"[A-Za-z]+"),
         ('NEWLINE', r'\n'),
         ('SKIP', r'[ \t]+'),
         ('WORD', r'[^ \t]+'),
     ]
-    ID_spec = {"QR", "PING", "OJI", "OMIKUJI"}
+    ID_spec = {"QR", "PING", "OJI", "OMIKUJI", "GAKUSEKI", "HELP"}
     token_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_spec)
     code_memo = []
     for mo in re.finditer(token_regex, code):
@@ -54,17 +56,21 @@ def test():
             "out": ["USERNAME", "QR", "URL"]
         },
         {
-            "in": "<@C011712375>    ping     192.2.0.1",
+            "in": "<@U01LJNE6FC7>    ping     192.2.0.1",
             "out": ["USERNAME", "PING", "IPv4"]
         },
         {
-            "in": "<@C011712375>    oji     hello world あああ",
+            "in": "<@U01LJNE6FC7>    oji     hello world あああ",
             "out": ["USERNAME", "OJI", "WORD"]
+        },
+        {
+            "in": "<@U01LJNE6FC7>  gakuseki C0117123",
+            "out": ["USERNAME", "GAKUSEKI", "STUDENT_ID"]
         }
     ]
     for tp in test_patterns:
         result = tokenizer(tp["in"])
-        assert [r.type for r in result] == tp["out"]
+        assert [r.type for r in result] == tp["out"], f"Err: {tp['in']}, {result}"
 
 
 if __name__ == '__main__':

@@ -50,15 +50,20 @@ def handle_mentions(body, say):
                     "type": "image",
                     "title": {
                         "type": "plain_text",
-                        "text": "Omikuji result " + chose_result["text"]
+                        "text": chose_result["text"]
                     },
                     "block_id": "image",
                     "image_url": chose_result["image"],
-                    "alt_text": "QR Code " + chose_result["text"]
+                    "alt_text": "Image " + chose_result["text"]
                 }
             ],
         )
+    elif tokenized_message_types == ["USERNAME", "gakuseki", "STUDENT_ID"]:
+        student_id = tokenized_message[2].value
+        student_name = ''
+        student_email = ''
 
+        
 
 @app.message("hello")
 def message_hello(message, say):
