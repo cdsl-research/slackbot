@@ -75,14 +75,12 @@ def handle_mentions(body, say):
                         "type": "section",
                         "fields": [
                             {
-                                "type": "plain_text",
-                                "text": f":e-mail: *Email:* {s_email}",
-                                "emoji": True
+                                "type": "mrkdwn",
+                                "text": f":e-mail:*Email:*\n{s_email}",
                             },
                             {
-                                "type": "plain_text",
-                                "text": f":pencil: *Real Name:* {s_real_name}",
-                                "emoji": True
+                                "type": "mrkdwn",
+                                "text": f":pencil:*Real Name:*\n{s_real_name}",
                             }
                         ]
                     }
