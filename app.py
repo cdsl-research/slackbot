@@ -69,8 +69,8 @@ def handle_mentions(body, say):
         else:
             s_email = the_student["email"]
             s_real_name = the_student["real_name"]
-            say(blocks=[{
-                "blocks": [
+            say(
+                blocks=[
                     {
                         "type": "section",
                         "fields": [
@@ -86,8 +86,8 @@ def handle_mentions(body, say):
                             }
                         ]
                     }
-                ]
-            }])
+                ],
+            )
 
 
 @app.message("hello")
