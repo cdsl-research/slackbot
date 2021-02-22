@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import json
 
 from slack_bolt import App
@@ -93,7 +94,12 @@ def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
 
-# group mension
+@app.message(re.compile(r"(.曜|明後|明|\d+)日"))
+def say_hello_regex(message, say, context):
+    # regular expression matches are inside of context.matches
+    greeting = context['matches'][0]
+    say(f"{greeting}, how are you?")
+
 
 if __name__ == "__main__":
     app.start(port=int(os.environ.get("PORT", 3000)))
