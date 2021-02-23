@@ -6,7 +6,11 @@ def parser_datetime(text: str):
     table = str.maketrans('：０１２３４５６７８９～　（）', ':0123456789- ()')
     fmt_txt = text.translate(table).replace(" ", "")
 
-    # 時間をさがす
+    # 時間をさがす(JP)
+    # raw_times = re.findall(
+    #    r'(?:2[0-3]|(?:0?|1)\d)時(?:[0-5]\d)?分', fmt_txt)
+
+    # 時間をさがす(US)
     raw_times = re.findall(
         r'(?:2[0-3]|(?:0?|1)\d):[0-5]\d\-(?:2[0-3]|[0-1]?\d):[0-5]\d', fmt_txt)
     time_pairs = []
@@ -16,19 +20,24 @@ def parser_datetime(text: str):
 
     # 日付をさがす
     month_day = re.findall(r"(?:(?P<month>\d+)月)?(?P<day>\d+)日",
-                           fmt_txt)  # (?:.曜|明後|明|\d+)日
+                           fmt_txt)
     date_paris = []
     for md in month_day:
-        if not md[0]:
+        if not md[0]:  # 月がない
             _month = int(dt.now().month)
         else:
             _month = int(md[0])
-        _day = int(md[1])  # todo
+        if not md[1]:  # 日がない
+            _day = int(dt.now().day)
+        else:
+            _day = int(md[1])
         # 現在の日より小さい && 月が未セット
         if dt.now().day > _day and not md[0]:
             _month = (_month + 1) // 13 + (_month + 1) % 13
         date_paris.append((_month, _day))
 
+    # (?:.曜|明後|明|\d+)日
+    # (?:[月火水木金土日]曜日?)
     return {
         "time": time_pairs,
         "date": date_paris,
@@ -97,7 +106,7 @@ def test():
     for tp in test_patterns:
         result = parser_datetime(tp["in"])
         # assert result == tp["out"]
-        print(tp["in"])
+        # print(tp["in"])
         print(result)
         print()
 
