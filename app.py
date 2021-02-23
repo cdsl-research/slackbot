@@ -95,6 +95,7 @@ def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
 
+# 予定の追加候補を提示
 @app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
 def handle_add_calendar(body, say):
     raw_message = body["event"]["text"]
@@ -138,10 +139,20 @@ def handle_add_calendar(body, say):
     )
 
 
+# Botの提示したスケジュール候補を選択
 @app.action("schdule_button_click")
-def action_button_click(body, ack, respond):
+def action_schdule_button_click(body, ack, respond):
     assert body.get("response_url") is not None
     ack()  # Acknowledge the action
+    print(body)
+    respond(f"<@{body['user']['id']}> clicked the button")
+
+
+# メッセージからサブメニュー経由でのBot呼び出し
+@app.action("schdule_register_button_click")
+def action_schdule_rester_button_click(body, ack, respond):
+    assert body.get("response_url") is not None
+    ack()
     print(body)
     respond(f"<@{body['user']['id']}> clicked the button")
 
