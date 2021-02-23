@@ -146,23 +146,20 @@ def handle_add_calendar(body, say):
     say(
         blocks=[
             {
-                "blocks": [
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "plain_text",
+                "type": "section",
+                "text": {
+                    "type": "plain_text",
                             "emoji": True,
-                                "text": ("BotからGoogleカレンダー :google-calendar: "
-                                         "に予定を追加できます．\n追加する予定を次の候補から選んでください．")
-                        }
-                    },
-                ] + _payload_wrapper(schdule_candidates)
+                            "text": ("BotからGoogleカレンダー :google-calendar: "
+                                     "に予定を追加できます．\n追加する予定を次の候補から選んでください．")
+                }
             }
-        ]
+        ] + _payload_wrapper(schdule_candidates),
+        text="xxx"
     )
 
 
-@app.action("schdule_button_click")
+@ app.action("schdule_button_click")
 def action_button_click(body, ack, say):
     assert body.get("response_url") is not None
     ack()  # Acknowledge the action
