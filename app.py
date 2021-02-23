@@ -99,8 +99,9 @@ def message_hello(message, say):
 def handle_add_calendar(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    join_txt = "\n".join([f"{dt_begin} - {dt_end}" for dt_begin,
-                          dt_end in datetime_ranges])
+    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
+                          dt_end in datetime_ranges]
+    """
     say(
         blocks=[
             {
@@ -114,6 +115,59 @@ def handle_add_calendar(body, say):
             }
         ],
     )
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*<fakelink.ToMoreTimes.com|Show more times>*"
+        }
+    }
+    """
+    def _payload_wrapper(titles):
+        return [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"*{title}*"
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {
+                        "type": "plain_text",
+                        "emoji": True,
+                        "text": "Choose"
+                    },
+                    "value": title,
+                    "action_id": "schdule_button_click"
+                }
+            } for title in titles
+        ]
+    say(
+        blocks=[
+            {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "plain_text",
+                            "emoji": True,
+                                "text": ("BotからGoogleカレンダー :google-calendar: "
+                                         "に予定を追加できます．\n追加する予定を次の候補から選んでください．")
+                        }
+                    },
+                ] + _payload_wrapper(schdule_candidates)
+            }
+        ]
+    )
+
+
+@app.action("schdule_button_click")
+def action_button_click(body, ack, say):
+    assert body.get("response_url") is not None
+    ack()  # Acknowledge the action
+    print(body)
+    say(f"<@{body['user']['id']}> clicked the button")
 
 
 if __name__ == "__main__":
