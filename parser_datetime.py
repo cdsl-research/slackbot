@@ -1,5 +1,5 @@
 import re
-from datetime import date, datetime as dt
+from datetime import datetime as dt
 
 
 def merge_date_time(_time: tuple, _date: tuple):
