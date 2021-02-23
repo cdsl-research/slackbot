@@ -1,5 +1,19 @@
 import re
-from datetime import datetime as dt
+from datetime import datetime as dt, time
+
+
+def merge_date_time(_time: tuple, _date: tuple):
+    # _time -> (begin_time, end_time)
+    # e.g. ('10:30', '20:22')
+    # _date -> (year, month, day)
+    # e.g. (2021, 2, 27)
+    t_begin = _time[0].split(":")
+    t_end = _time[1].split(":")
+    dt_begin = dt(year=_date[0], month=_date[1], day=_date[2],
+                  hour=int(t_begin[0]), minute=int(t_begin[1]))
+    dt_end = dt(year=_date[0], month=_date[1], day=_date[2],
+                hour=int(t_end[0]), minute=int(t_end[1]))
+    return (dt_begin, dt_end)
 
 
 def parser_datetime(text: str):
@@ -31,10 +45,19 @@ def parser_datetime(text: str):
             _day = int(dt.now().day)
         else:
             _day = int(md[1])
+        _year = int(dt.now().year)
         # 現在の日より小さい && 月が未セット
         if dt.now().day > _day and not md[0]:
             _month = (_month + 1) // 13 + (_month + 1) % 13
-        date_paris.append((_month, _day))
+            if _month == 1:
+                _year += 1
+        date_paris.append((_year, _month, _day))
+
+    # 時間と日付を統合
+    for tp in time_pairs:
+        for dp in date_paris:
+            result = merge_date_time(tp, dp)
+            print(result)
 
     # (?:.曜|明後|明|\d+)日
     # (?:[月火水木金土日]曜日?)
@@ -106,8 +129,8 @@ def test():
     for tp in test_patterns:
         result = parser_datetime(tp["in"])
         # assert result == tp["out"]
-        # print(tp["in"])
-        print(result)
+        print(tp["in"])
+        # print(result)
         print()
 
 
