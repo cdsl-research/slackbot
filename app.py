@@ -144,7 +144,7 @@ def handle_add_calendar(body, say):
 def action_schdule_button_click(body, ack, respond):
     assert body.get("response_url") is not None
     ack()  # Acknowledge the action
-    print(body)
+    json.dumps(body, sort_keys=True, indent=4)
     respond(f"<@{body['user']['id']}> clicked the button")
 
 
@@ -153,7 +153,7 @@ def action_schdule_button_click(body, ack, respond):
 def action_schdule_rester_button_click(body, ack, respond):
     assert body.get("response_url") is not None
     ack()
-    print(body)
+    json.dumps(body, sort_keys=True, indent=4)
     respond(f"<@{body['user']['id']}> clicked the button")
 
 
