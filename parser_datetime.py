@@ -1,17 +1,20 @@
 import re
-from datetime import datetime as dt, time
+from datetime import date, datetime as dt, time
 
 
 def merge_date_time(_time: tuple, _date: tuple):
     # _time -> (begin_time, end_time)
     # e.g. ('10:30', '20:22')
-    # _date -> (year, month, day)
-    # e.g. (2021, 2, 27)
+    # _date -> ( (begin_year, begin_month, begin_day),
+    #            (end_year, end_month, end_day) )
+    # e.g. ( (2021, 2, 27), (2021, 3, 27) )
+    assert len(_time) == 2, "Invalid argument _time"
+    assert len(_date) == 2, "Invalid argument _date"
     t_begin = _time[0].split(":")
     t_end = _time[1].split(":")
-    dt_begin = dt(year=_date[0], month=_date[1], day=_date[2],
+    dt_begin = dt(year=_date[0][0], month=_date[0][1], day=_date[0][2],
                   hour=int(t_begin[0]), minute=int(t_begin[1]))
-    dt_end = dt(year=_date[0], month=_date[1], day=_date[2],
+    dt_end = dt(year=_date[1][0], month=_date[1][1], day=_date[1][2],
                 hour=int(t_end[0]), minute=int(t_end[1]))
     return (dt_begin, dt_end)
 
@@ -32,16 +35,20 @@ def parser_datetime(text: str):
         t_begin, t_end = rt.split("-")
         time_pairs.append((t_begin, t_end))
 
+    # 時間がない場合→終日
+    if len(time_pairs) == 0:
+        time_pairs = [("0:00", "23:59")]
+
     # 日付をさがす
     month_day = re.findall(r"(?:(?P<month>\d+)月)?(?P<day>\d+)日",
                            fmt_txt)
-    date_paris = []
+    date_pairs = []
     for md in month_day:
-        if not md[0]:  # 月がない
+        if md[0] == "":  # 月がない
             _month = int(dt.now().month)
         else:
             _month = int(md[0])
-        if not md[1]:  # 日がない
+        if md[1] == "":  # 日がない
             _day = int(dt.now().day)
         else:
             _day = int(md[1])
@@ -51,20 +58,32 @@ def parser_datetime(text: str):
             _month = (_month + 1) // 13 + (_month + 1) % 13
             if _month == 1:
                 _year += 1
-        date_paris.append((_year, _month, _day))
+        date_pairs.append((_year, _month, _day))
+
+    # 日付がない場合→今日
+    if len(date_pairs) == 0:
+        _year = int(dt.now().year)
+        _month = int(dt.now().month)
+        _day = int(dt.now().day)
+        date_pairs.append((_year, _month, _day))
 
     # 時間と日付を統合
-    for tp in time_pairs:
-        for dp in date_paris:
-            result = merge_date_time(tp, dp)
-            print(result)
+    result = []
 
+    # 日付と時間の数が不一致の場合
+    if len(date_pairs) % 2 != 0:
+        date_pairs.append(date_pairs[-1])
+    # print(time_pairs, date_pairs)
+
+    dp_iter = iter(date_pairs)
+    for dp1, dp2 in zip(dp_iter, dp_iter):
+        for tp in time_pairs:
+            result.append(merge_date_time(tp, (dp1, dp2)))
+
+    # print(result)
     # (?:.曜|明後|明|\d+)日
     # (?:[月火水木金土日]曜日?)
-    return {
-        "time": time_pairs,
-        "date": date_paris,
-    }
+    return result
 
 
 def test():
@@ -130,7 +149,7 @@ def test():
         result = parser_datetime(tp["in"])
         # assert result == tp["out"]
         print(tp["in"])
-        # print(result)
+        print(result)
         print()
 
 
