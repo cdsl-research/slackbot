@@ -101,28 +101,7 @@ def handle_add_calendar(body, say):
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
                           dt_end in datetime_ranges]
-    """
-    say(
-        blocks=[
-            {
-                "type": "section",
-                "fields": [
-                    {
-                        "type": "mrkdwn",
-                        "text": f":calendar:*Schdule Candidates:*\n{join_txt}",
-                    }
-                ]
-            }
-        ],
-    )
-    {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": "*<fakelink.ToMoreTimes.com|Show more times>*"
-        }
-    }
-    """
+
     def _payload_wrapper(titles):
         return [
             {
@@ -155,16 +134,16 @@ def handle_add_calendar(body, say):
                 }
             }
         ] + _payload_wrapper(schdule_candidates),
-        text="xxx"
+        text="Schdule candidates display"
     )
 
 
-@ app.action("schdule_button_click")
-def action_button_click(body, ack, say):
+@app.action("schdule_button_click")
+def action_button_click(body, ack, respond):
     assert body.get("response_url") is not None
     ack()  # Acknowledge the action
     print(body)
-    say(f"<@{body['user']['id']}> clicked the button")
+    respond(f"<@{body['user']['id']}> clicked the button")
 
 
 if __name__ == "__main__":
