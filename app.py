@@ -6,6 +6,7 @@ import json
 from slack_bolt import App
 
 import member_list
+import parser_datetime
 import tokenizer
 
 # Import the async app instead of the regular one
@@ -25,7 +26,7 @@ def handle_mentions(body, say):
     raw_message = body["event"]["text"]
     tokenized_message = tokenizer.tokenizer(raw_message)
     tokenized_message_types = [x.type for x in tokenized_message]
-    print(tokenized_message)
+    # print(tokenized_message)
 
     if tokenized_message_types == ["USERNAME", "QR", "URL"]:
         target_url = tokenized_message[2].value
@@ -94,11 +95,25 @@ def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
 
-@app.message(re.compile(r"(.曜|明後|明|\d+)日"))
-def say_hello_regex(message, say, context):
-    # regular expression matches are inside of context.matches
-    greeting = context['matches'][0]
-    say(f"{greeting}, how are you?")
+@app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
+def handle_add_calendar(body, say):
+    raw_message = body["event"]["text"]
+    datetime_ranges = parser_datetime.parser_datetime(raw_message)
+    join_txt = "\n".join([f"{dt_begin} - {dt_end}" for dt_begin,
+                          dt_end in datetime_ranges])
+    say(
+        blocks=[
+            {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f":calendar:*Schdule Candidates:*\n{join_txt}",
+                    }
+                ]
+            }
+        ],
+    )
 
 
 if __name__ == "__main__":
