@@ -141,20 +141,18 @@ def handle_add_calendar(body, say):
 
 # Botの提示したスケジュール候補を選択
 @app.action("schdule_button_click")
-def action_schdule_button_click(body, ack, respond):
-    json.dumps(body, sort_keys=True, indent=4)
+def action_schdule_button_click(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
-    respond(f"<@{body['user']['id']}> clicked the button")
+    respond(f"<@{body['user']['id']}> clicked the button. {action}")
 
 
 # メッセージからサブメニュー経由でのBot呼び出し
 @app.shortcut("schdule_register_button_click")
-def action_schdule_rester_button_click(body, ack, respond):
-    json.dumps(body, sort_keys=True, indent=4)
+def action_schdule_rester_button_click(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
-    respond(f"<@{body['user']['id']}> clicked the button")
+    respond(f"<@{body['user']['id']}> clicked the button. {action}")
 
 
 if __name__ == "__main__":
