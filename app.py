@@ -172,9 +172,12 @@ def handle_add_calendar(body, say):
 def action_schdule_button_click(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
-    # selected_value = action.get("selected_option").get("value")
-    selected_label = action.get("selected_option").get("text").get("text")
-    respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_label}")
+    try:
+        # selected_value = action["selected_option"]["value"]
+        selected_label = action["selected_option"]["text"]["text"]
+        respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_label}")
+    except Exception:
+        return
 
 
 # メッセージからサブメニュー経由でのBot呼び出し
@@ -182,11 +185,42 @@ def action_schdule_button_click(body, ack, respond, action):
 def schdule_register_shortcut(body, ack, respond):
     assert body.get("response_url") is not None
     ack()
-    raw_message = body["event"]["text"]
+    try:
+        raw_message = body["message"]["text"]
+    except Exception:
+        return
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
                           dt_end in datetime_ranges]
-    respond(f"{schdule_candidates}")
+    respond(
+        text="Schdule candidates display",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "BotからGoogleカレンダーに予定を追加できます．"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "予定の日時を選んでください．"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "日時の候補",
+                                "emoji": True
+                    },
+                    "options": _payload_wrapper(schdule_candidates),
+                    "action_id": "schdule-select"
+                }
+            }
+        ]
+    )
 
 
 if __name__ == "__main__":
