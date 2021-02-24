@@ -217,9 +217,9 @@ def schdule_title_action(body, ack, respond, action):
     try:
         # selected_value = action["selected_option"]["value"]
         # selected_label = action["selected_option"]["text"]["text"]
-        user_id = action["user"]["id"]
+        user_id = body["user"]["id"]
     except Exception:
-        respond(f"Error {action}")
+        respond(f"Error {body}")
         return
     # resolve user_id into user_name
     students = member_list.get_members()
