@@ -108,16 +108,15 @@ def _payload_wrapper(titles):
     ]
 
 
-# 予定の追加候補を提示
+# 起点) [1] 書き込みに曜日や日付を含む文字列が含まれる
 @app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
-def handle_add_calendar(body, say):
+def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
                           dt_end in datetime_ranges]
-
     say(
-        text="Schdule candidates display",
+        text="Schdule candidates select",
         blocks=[
             {
                 "type": "section",
@@ -140,7 +139,50 @@ def handle_add_calendar(body, say):
                                 "emoji": True
                     },
                     "options": _payload_wrapper(schdule_candidates),
-                    "action_id": "schdule-select"
+                    "action_id": "schdule-title-select"
+                }
+            }
+        ]
+    )
+
+
+# 起点) [1] メッセージからサブメニュー経由でのBot呼び出し
+@app.shortcut("schdule-register-shortcut")
+def schdule_register_shortcut(body, ack, respond):
+    assert body.get("response_url") is not None
+    ack()
+    try:
+        raw_message = body["message"]["text"]
+    except Exception:
+        return
+    datetime_ranges = parser_datetime.parser_datetime(raw_message)
+    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
+                          dt_end in datetime_ranges]
+    respond(
+        text="Schdule candidates select",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "BotからGoogleカレンダーに予定を追加できます．"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "予定の日時を選んでください．"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "日時の候補",
+                                "emoji": True
+                    },
+                    "options": _payload_wrapper(schdule_candidates),
+                    "action_id": "schdule-title-select"
                 }
             }
         ]
@@ -152,7 +194,7 @@ def handle_add_calendar(body, say):
     "type": "section",
     "text": {
         "type": "mrkdwn",
-        "text": "Test block with users select"
+        "text": "会議の参加者"
     },
     "accessory": {
         "type": "users_select",
@@ -167,60 +209,62 @@ def handle_add_calendar(body, say):
 """
 
 
-# Botの提示したスケジュール候補を選択
-@app.action("schdule-select")
-def action_schdule_button_click(body, ack, respond, action):
+# [2] Botの提示したスケジュール候補が選択
+@app.action("schdule-title-select")
+def schdule_title_action(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
     try:
         # selected_value = action["selected_option"]["value"]
-        selected_label = action["selected_option"]["text"]["text"]
-        respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_label}")
+        # selected_label = action["selected_option"]["text"]["text"]
+        user_id = action["user"]["id"]
+
+        # resolve user_id into user_name
+        students = member_list.get_members()
+        result = list(filter(lambda x: x["uid"] == user_id, students.values()))
+        user_name = result[0]["name"]
+        schdule_title_candidates = (
+            f"補講({user_name})",
+            f"個別面談({user_name})",
+            f"卒業課題MTG({user_name})",
+            f"創成課題MTG({user_name})",
+            f"論文チェック({user_name})",
+            f"勉強会({user_name})"
+        )
+        respond(
+            text="Schdule title select",
+            blocks=[
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "予定のタイトルを選んでください．"
+                    },
+                    "accessory": {
+                        "type": "static_select",
+                        "placeholder": {
+                            "type": "plain_text",
+                            "text": "タイトル名",
+                                    "emoji": True
+                        },
+                        "options": _payload_wrapper(schdule_title_candidates),
+                        "action_id": "schdule-done"
+                    }
+                }
+            ]
+        )
     except Exception:
         return
 
 
-# メッセージからサブメニュー経由でのBot呼び出し
-@app.shortcut("schdule-register-shortcut")
-def schdule_register_shortcut(body, ack, respond):
+# [3] Botの予定タイトル名が選択
+@app.action("schdule-done")
+def schdule_done_action(ack, body, respond, action):
     assert body.get("response_url") is not None
     ack()
-    try:
-        raw_message = body["message"]["text"]
-    except Exception:
-        return
-    datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
-                          dt_end in datetime_ranges]
-    respond(
-        text="Schdule candidates display",
-        blocks=[
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "BotからGoogleカレンダーに予定を追加できます．"
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "予定の日時を選んでください．"
-                },
-                "accessory": {
-                    "type": "static_select",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "日時の候補",
-                                "emoji": True
-                    },
-                    "options": _payload_wrapper(schdule_candidates),
-                    "action_id": "schdule-select"
-                }
-            }
-        ]
-    )
+    # selected_value = action["selected_option"]["value"]
+    selected_label = action["selected_option"]["text"]["text"]
+    respond(f"{selected_label}が選ばれました.")
 
 
 if __name__ == "__main__":
