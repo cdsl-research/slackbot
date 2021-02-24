@@ -95,6 +95,19 @@ def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
 
+def _payload_wrapper(titles):
+    return [
+        {
+            "text": {
+                "type": "plain_text",
+                "text": f"{title}",
+                "emoji": True
+            },
+            "value": title
+        } for title in titles
+    ]
+
+
 # 予定の追加候補を提示
 @app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
 def handle_add_calendar(body, say):
@@ -103,17 +116,6 @@ def handle_add_calendar(body, say):
     schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
                           dt_end in datetime_ranges]
 
-    def _payload_wrapper(titles):
-        return [
-            {
-                "text": {
-                    "type": "plain_text",
-                    "text": f"{title}",
-                    "emoji": True
-                },
-                "value": title
-            } for title in titles
-        ]
     say(
         text="Schdule candidates display",
         blocks=[
@@ -177,9 +179,43 @@ def action_schdule_button_click(body, ack, respond, action):
 
 # メッセージからサブメニュー経由でのBot呼び出し
 @app.shortcut("schdule_register_button_click")
-def action_schdule_rester_button_click(body, ack):
+def action_schdule_rester_button_click(body, ack, say):
     assert body.get("response_url") is not None
     ack()
+    raw_message = body["event"]["text"]
+    datetime_ranges = parser_datetime.parser_datetime(raw_message)
+    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
+                          dt_end in datetime_ranges]
+
+    say(
+        text="Schdule candidates display",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "BotからGoogleカレンダーに予定を追加できます．"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "予定の日時を選んでください．"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "日時の候補",
+                                "emoji": True
+                    },
+                    "options": _payload_wrapper(schdule_candidates),
+                    "action_id": "schdule-select"
+                }
+            }
+        ]
+    )
 
 
 if __name__ == "__main__":
