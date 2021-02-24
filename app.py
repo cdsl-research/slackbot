@@ -219,7 +219,7 @@ def schdule_title_action(body, ack, respond, action):
         # selected_label = action["selected_option"]["text"]["text"]
         user_id = action["user"]["id"]
     except Exception:
-        respond("Error")
+        respond(f"Error {action}")
         return
     # resolve user_id into user_name
     students = member_list.get_members()
