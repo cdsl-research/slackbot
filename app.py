@@ -218,43 +218,43 @@ def schdule_title_action(body, ack, respond, action):
         # selected_value = action["selected_option"]["value"]
         # selected_label = action["selected_option"]["text"]["text"]
         user_id = action["user"]["id"]
-
-        # resolve user_id into user_name
-        students = member_list.get_members()
-        result = list(filter(lambda x: x["uid"] == user_id, students.values()))
-        user_name = result[0]["name"]
-        schdule_title_candidates = (
-            f"補講({user_name})",
-            f"個別面談({user_name})",
-            f"卒業課題MTG({user_name})",
-            f"創成課題MTG({user_name})",
-            f"論文チェック({user_name})",
-            f"勉強会({user_name})"
-        )
-        respond(
-            text="Schdule title select",
-            blocks=[
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "予定のタイトルを選んでください．"
-                    },
-                    "accessory": {
-                        "type": "static_select",
-                        "placeholder": {
-                            "type": "plain_text",
-                            "text": "タイトル名",
-                                    "emoji": True
-                        },
-                        "options": _payload_wrapper(schdule_title_candidates),
-                        "action_id": "schdule-done"
-                    }
-                }
-            ]
-        )
     except Exception:
+        respond("Error")
         return
+    # resolve user_id into user_name
+    students = member_list.get_members()
+    result = list(filter(lambda x: x["uid"] == user_id, students.values()))
+    user_name = result[0]["name"]
+    schdule_title_candidates = (
+        f"補講({user_name})",
+        f"個別面談({user_name})",
+        f"卒業課題MTG({user_name})",
+        f"創成課題MTG({user_name})",
+        f"論文チェック({user_name})",
+        f"勉強会({user_name})"
+    )
+    respond(
+        text="Schdule title select",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "予定のタイトルを選んでください．"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "タイトル名",
+                                "emoji": True
+                    },
+                    "options": _payload_wrapper(schdule_title_candidates),
+                    "action_id": "schdule-done"
+                }
+            }
+        ]
+    )
 
 
 # [3] Botの予定タイトル名が選択
