@@ -138,7 +138,7 @@ def handle_add_calendar(body, say):
                                 "emoji": True
                     },
                     "options": _payload_wrapper(schdule_candidates),
-                    "action_id": "schdule_button_click"
+                    "action_id": "schdule-select"
                 }
             }
         ]
@@ -164,15 +164,15 @@ def handle_add_calendar(body, say):
 },
 """
 
+
 # Botの提示したスケジュール候補を選択
-
-
-@app.action("schdule_button_click")
+@app.action("schdule-select")
 def action_schdule_button_click(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
-    selected_value = action.get("value")
-    respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_value}")
+    # selected_value = action.get("selected_option").get("value")
+    selected_label = action.get("selected_option").get("text").get("text")
+    respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_label}")
 
 
 # メッセージからサブメニュー経由でのBot呼び出し
