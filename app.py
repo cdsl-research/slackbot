@@ -178,44 +178,15 @@ def action_schdule_button_click(body, ack, respond, action):
 
 
 # メッセージからサブメニュー経由でのBot呼び出し
-@app.shortcut("schdule_register_button_click")
-def action_schdule_rester_button_click(body, ack, say):
+@app.shortcut("schdule-register-shortcut")
+def schdule_register_shortcut(body, ack, respond):
     assert body.get("response_url") is not None
     ack()
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
                           dt_end in datetime_ranges]
-
-    say(
-        text="Schdule candidates display",
-        blocks=[
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "BotからGoogleカレンダーに予定を追加できます．"
-                }
-            },
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": "予定の日時を選んでください．"
-                },
-                "accessory": {
-                    "type": "static_select",
-                    "placeholder": {
-                        "type": "plain_text",
-                        "text": "日時の候補",
-                                "emoji": True
-                    },
-                    "options": _payload_wrapper(schdule_candidates),
-                    "action_id": "schdule-select"
-                }
-            }
-        ]
-    )
+    respond(f"{schdule_candidates}")
 
 
 if __name__ == "__main__":
