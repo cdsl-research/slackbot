@@ -108,7 +108,7 @@ def handle_add_calendar(body, say):
             {
                 "text": {
                     "type": "plain_text",
-                    "text": f"*{title}*",
+                    "text": f"{title}",
                     "emoji": True
                 },
                 "value": title
