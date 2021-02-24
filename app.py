@@ -224,7 +224,7 @@ def schdule_title_action(body, ack, respond, action):
     # resolve user_id into user_name
     students = member_list.get_members()
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
-    user_name = result[0]["name"]
+    user_name = result[0]["real_name"]
     schdule_title_candidates = (
         f"補講({user_name})",
         f"個別面談({user_name})",
