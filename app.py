@@ -106,53 +106,80 @@ def handle_add_calendar(body, say):
     def _payload_wrapper(titles):
         return [
             {
-                "type": "section",
                 "text": {
-                    "type": "mrkdwn",
-                    "text": f"*{title}*"
+                    "type": "plain_text",
+                    "text": f"*{title}*",
+                    "emoji": True
                 },
-                "accessory": {
-                    "type": "button",
-                    "text": {
-                        "type": "plain_text",
-                        "emoji": True,
-                        "text": "Choose"
-                    },
-                    "value": title,
-                    "action_id": "schdule_button_click"
-                }
+                "value": title
             } for title in titles
         ]
     say(
+        text="Schdule candidates display",
         blocks=[
             {
                 "type": "section",
                 "text": {
-                    "type": "plain_text",
-                            "emoji": True,
-                            "text": ("BotからGoogleカレンダー :google-calendar: "
-                                     "に予定を追加できます．\n追加する予定を次の候補から選んでください．")
+                    "type": "mrkdwn",
+                    "text": "BotからGoogleカレンダーに予定を追加できます．"
+                }
+            },
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "予定の日時を選んでください．"
+                },
+                "accessory": {
+                    "type": "static_select",
+                    "placeholder": {
+                        "type": "plain_text",
+                        "text": "日時の候補",
+                                "emoji": True
+                    },
+                    "options": _payload_wrapper(schdule_candidates),
+                    "action_id": "schdule_button_click"
                 }
             }
-        ] + _payload_wrapper(schdule_candidates),
-        text="Schdule candidates display"
+        ]
     )
 
 
+"""
+{
+    "type": "section",
+    "text": {
+        "type": "mrkdwn",
+        "text": "Test block with users select"
+    },
+    "accessory": {
+        "type": "users_select",
+        "placeholder": {
+            "type": "plain_text",
+            "text": "Select a user",
+            "emoji": True
+        },
+        "action_id": "users_select-action"
+    }
+},
+"""
+
 # Botの提示したスケジュール候補を選択
+
+
 @app.action("schdule_button_click")
 def action_schdule_button_click(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
-    respond(f"<@{body['user']['id']}> clicked the button. {action}")
+    selected_value = action.get("value")
+    respond(f"<@{body['user']['id']}>次の予定を追加しました．\n{selected_value}")
 
 
 # メッセージからサブメニュー経由でのBot呼び出し
 @app.shortcut("schdule_register_button_click")
-def action_schdule_rester_button_click(body, ack, respond, action):
+def action_schdule_rester_button_click(body, ack):
     assert body.get("response_url") is not None
     ack()
-    respond(f"<@{body['user']['id']}> clicked the button. {action}")
 
 
 if __name__ == "__main__":
