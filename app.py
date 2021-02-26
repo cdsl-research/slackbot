@@ -260,8 +260,8 @@ def schdule_done_action(ack, body, respond, action):
     selected_value = action["selected_option"]["value"]
     schdule_title, _schdule_date = selected_value.split(" | ")[0:2]
     _schdule_begin, _schdule_end = _schdule_date.split(" - ")[0:2]
-    schdule_begin = datetime.utcfromtimestamp(int(_schdule_begin))
-    schdule_end = datetime.utcfromtimestamp(int(_schdule_end))
+    schdule_begin = datetime.fromtimestamp(int(_schdule_begin))
+    schdule_end = datetime.fromtimestamp(int(_schdule_end))
     respond(
         text="Schdule created",
         blocks=[
