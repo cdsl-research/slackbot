@@ -224,14 +224,18 @@ def schdule_title_action(body, ack, respond, action):
     # resolve user_id into user_name
     students = member_list.get_members()
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
+    # Pickup 漢字
     user_name = result[0]["real_name"]
+    import regex
+    p = regex.compile(r'[\p{Script=Han}]')
+    _user_name = "".join(p.findall(user_name))
     schdule_title_candidates = (
-        f"補講({user_name})",
-        f"個別面談({user_name})",
-        f"卒業課題MTG({user_name})",
-        f"創成課題MTG({user_name})",
-        f"論文チェック({user_name})",
-        f"勉強会({user_name})"
+        f"補講({_user_name})",
+        f"個別面談({_user_name})",
+        f"卒業課題MTG({_user_name})",
+        f"創成課題MTG({_user_name})",
+        f"論文チェック({_user_name})",
+        f"勉強会({_user_name})"
     )
     respond(
         text="Schdule title select",
