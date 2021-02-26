@@ -287,7 +287,6 @@ def schdule_done_action(ack, body, respond, action):
             }
         ]
     )
-    respond(f"{schdule_title}が選ばれました.")
 
 
 if __name__ == "__main__":
