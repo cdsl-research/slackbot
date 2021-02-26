@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import random
 import re
@@ -95,17 +96,21 @@ def message_hello(message, say):
     say(f"Hey there <@{message['user']}>!")
 
 
-def _payload_wrapper(titles):
+def _payload_wrapper(_items):
     return [
         {
             "text": {
                 "type": "plain_text",
-                "text": f"{title}",
+                "text": f"{label}",
                 "emoji": True
             },
-            "value": title
-        } for title in titles
+            "value": value
+        } for label, value in _items
     ]
+
+
+def fmt_dt(_dt: datetime):
+    return _dt.strftime(r"%m/%d %H:%M")
 
 
 # 起点) [1] 書き込みに曜日や日付を含む文字列が含まれる
@@ -113,8 +118,9 @@ def _payload_wrapper(titles):
 def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
-                          dt_end in datetime_ranges]
+    schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
+                           f"{dt_begin} - {dt_end}")
+                          for dt_begin, dt_end in datetime_ranges]
     say(
         text="Schdule candidates select",
         blocks=[
@@ -147,7 +153,7 @@ def schdule_register_message(body, say):
 
 
 # 起点) [1] メッセージからサブメニュー経由でのBot呼び出し
-@app.shortcut("schdule-register-shortcut")
+@ app.shortcut("schdule-register-shortcut")
 def schdule_register_shortcut(body, ack, respond):
     assert body.get("response_url") is not None
     ack()
@@ -156,8 +162,9 @@ def schdule_register_shortcut(body, ack, respond):
     except Exception:
         return
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    schdule_candidates = [f"{dt_begin} - {dt_end}" for dt_begin,
-                          dt_end in datetime_ranges]
+    schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
+                           f"{dt_begin} - {dt_end}")
+                          for dt_begin, dt_end in datetime_ranges]
     respond(
         text="Schdule candidates select",
         blocks=[
@@ -189,33 +196,13 @@ def schdule_register_shortcut(body, ack, respond):
     )
 
 
-"""
-{
-    "type": "section",
-    "text": {
-        "type": "mrkdwn",
-        "text": "会議の参加者"
-    },
-    "accessory": {
-        "type": "users_select",
-        "placeholder": {
-            "type": "plain_text",
-            "text": "Select a user",
-            "emoji": True
-        },
-        "action_id": "users_select-action"
-    }
-},
-"""
-
-
 # [2] Botの提示したスケジュール候補が選択
-@app.action("schdule-title-select")
+@ app.action("schdule-title-select")
 def schdule_title_action(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
     try:
-        # selected_value = action["selected_option"]["value"]
+        selected_value = action["selected_option"]["value"]
         # selected_label = action["selected_option"]["text"]["text"]
         user_id = body["user"]["id"]
     except Exception:
@@ -226,8 +213,7 @@ def schdule_title_action(body, ack, respond, action):
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
     # Pickup 漢字
     user_name = result[0]["real_name"]
-    import regex
-    p = regex.compile(r'[\p{Script=Han}]')
+    p = re.compile(r"[一-鿐]")
     _user_name = "".join(p.findall(user_name))
     schdule_title_candidates = (
         f"補講({_user_name})",
@@ -237,6 +223,8 @@ def schdule_title_action(body, ack, respond, action):
         f"論文チェック({_user_name})",
         f"勉強会({_user_name})"
     )
+    _schdule_title_candidates = [
+        (x, f"{x} {selected_value}") for x in schdule_title_candidates]
     respond(
         text="Schdule title select",
         blocks=[
@@ -253,7 +241,7 @@ def schdule_title_action(body, ack, respond, action):
                         "text": "タイトル名",
                                 "emoji": True
                     },
-                    "options": _payload_wrapper(schdule_title_candidates),
+                    "options": _payload_wrapper(_schdule_title_candidates),
                     "action_id": "schdule-done"
                 }
             }
@@ -262,7 +250,7 @@ def schdule_title_action(body, ack, respond, action):
 
 
 # [3] Botの予定タイトル名が選択
-@app.action("schdule-done")
+@ app.action("schdule-done")
 def schdule_done_action(ack, body, respond, action):
     assert body.get("response_url") is not None
     ack()
