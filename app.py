@@ -119,7 +119,8 @@ def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{dt_begin.timestamp()} - {dt_end.timestamp()}")
+                           f"{int(dt_begin.timestamp())}"
+                           f" - {int(dt_end.timestamp())}")
                           for dt_begin, dt_end in datetime_ranges]
     say(
         text="Schdule candidates select",
@@ -163,7 +164,8 @@ def schdule_register_shortcut(body, ack, respond):
         return
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{dt_begin.timestamp()} - {dt_end.timestamp()}")
+                           f"{int(dt_begin.timestamp())}"
+                           f" - {int(dt_end.timestamp())}")
                           for dt_begin, dt_end in datetime_ranges]
     respond(
         text="Schdule candidates select",
@@ -260,7 +262,6 @@ def schdule_done_action(ack, body, respond, action):
     _schdule_begin, _schdule_end = _schdule_date.split(" - ")[0:2]
     schdule_begin = datetime.timestamp(int(_schdule_begin))
     schdule_end = datetime.timestamp(int(_schdule_end))
-    """
     respond(
         text="Schdule created",
         blocks=[
@@ -287,8 +288,6 @@ def schdule_done_action(ack, body, respond, action):
             }
         ]
     )
-    """
-    respond(f"{schdule_title}が選ばれました.")
 
 
 if __name__ == "__main__":
