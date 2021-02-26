@@ -43,7 +43,7 @@ def handle_mentions(body, say):
                     "image_url": QR_BASE_URL + target_url,
                     "alt_text": "QR Code"
                 }
-            ],
+            ]
         )
     elif tokenized_message_types == ["USERNAME", "OMIKUJI"]:
         with open("omikuji_result.json") as f:
@@ -61,7 +61,7 @@ def handle_mentions(body, say):
                     "image_url": chose_result["image"],
                     "alt_text": "Image " + chose_result["text"]
                 }
-            ],
+            ]
         )
     elif tokenized_message_types == ["USERNAME", "GAKUSEKI", "STUDENT_ID"]:
         students = member_list.get_members()
@@ -87,7 +87,7 @@ def handle_mentions(body, say):
                             }
                         ]
                     }
-                ],
+                ]
             )
 
 
@@ -119,7 +119,7 @@ def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{dt_begin} - {dt_end}")
+                           f"{dt_begin.timestamp()} - {dt_end.timestamp()}")
                           for dt_begin, dt_end in datetime_ranges]
     say(
         text="Schdule candidates select",
@@ -163,7 +163,7 @@ def schdule_register_shortcut(body, ack, respond):
         return
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{dt_begin} - {dt_end}")
+                           f"{dt_begin.timestamp()} - {dt_end.timestamp()}")
                           for dt_begin, dt_end in datetime_ranges]
     respond(
         text="Schdule candidates select",
@@ -202,6 +202,7 @@ def schdule_title_action(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
     try:
+        # begin_time - end_time
         selected_value = action["selected_option"]["value"]
         # selected_label = action["selected_option"]["text"]["text"]
         user_id = body["user"]["id"]
@@ -224,7 +225,7 @@ def schdule_title_action(body, ack, respond, action):
         f"勉強会({_user_name})"
     )
     _schdule_title_candidates = [
-        (x, f"{x} {selected_value}") for x in schdule_title_candidates]
+        (x, f"{x} | {selected_value}") for x in schdule_title_candidates]
     respond(
         text="Schdule title select",
         blocks=[
@@ -254,9 +255,39 @@ def schdule_title_action(body, ack, respond, action):
 def schdule_done_action(ack, body, respond, action):
     assert body.get("response_url") is not None
     ack()
-    # selected_value = action["selected_option"]["value"]
-    selected_label = action["selected_option"]["text"]["text"]
-    respond(f"{selected_label}が選ばれました.")
+    selected_value = action["selected_option"]["value"]
+    schdule_title, _schdule_date = selected_value.split(" | ")[0:2]
+    _schdule_begin, _schdule_end = _schdule_date.split(" - ")[0:2]
+    schdule_begin = datetime.timestamp(int(_schdule_begin))
+    schdule_end = datetime.timestamp(int(_schdule_end))
+
+    respond(
+        text="Schdule created",
+        blocks=[
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Googleカレンダに次の予定を追加しました．"
+                }
+            },
+            {
+                "type": "section",
+                "fields": [
+                    {
+                        "type": "mrkdwn",
+                        "text": f":pencil:*Title:*\n{schdule_title}",
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": (f":calendar:*Date:*\n{fmt_dt(schdule_begin)}"
+                                 f" - {fmt_dt(schdule_end)}"),
+                    }
+                ]
+            }
+        ]
+    )
+    respond(f"{schdule_title}が選ばれました.")
 
 
 if __name__ == "__main__":
