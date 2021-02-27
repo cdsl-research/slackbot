@@ -13,7 +13,7 @@ assert CAL_ID is not None, "Fail to get GOOGLE_CALENDAR_ID"
 
 
 def dt_to_rfc3339(_dt: datetime) -> str:
-    return _dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    return _dt.strftime('%Y-%m-%dT%H:%M:%S+09:00')
 
 
 def add(
