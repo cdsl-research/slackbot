@@ -119,10 +119,14 @@ def fmt_dt(_dt: datetime):
 def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{int(dt_begin.timestamp())}"
-                           f" - {int(dt_end.timestamp())}")
-                          for dt_begin, dt_end in datetime_ranges]
+    schdule_candidates = []
+    for dt_begin, dt_end in datetime_ranges:
+        option_label = f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}"
+        option_value = json.dumps({
+            "begin_datetime_unix": int(dt_begin.timestamp()),
+            "end_datetime_unix": int(dt_end.timestamp()),
+        })
+        schdule_candidates.append((option_label, option_value))
     say(
         text="Schdule candidates select",
         blocks=[
