@@ -2,3 +2,5 @@
 env/**
 __pycache__/**
 mamber_list.json
+secret.json
+token.pickle
