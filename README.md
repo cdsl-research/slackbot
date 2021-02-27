@@ -2,11 +2,10 @@
 
 オリジナルなSlackbotを開発するぞ！
 
-## 参考リンク
 
-Guide [Slack | Bolt for Python](https://slack.dev/bolt-python/tutorial/getting-started)
+## デプロイ
 
-Code [Bolt for Python](https://github.com/slackapi/bolt-python)
+[esaにまとめた](https://cdsl-tut.esa.io/posts/417)
 
 ## 開発ガイド
 
@@ -80,3 +79,9 @@ Slack APIの設定から `Event Subscriptions` を選び，`Enable Events` に�
 [Slack APIの設定](https://api.slack.com/apps/A01LZEC2UG2/event-subscriptions)
 
 <img src="./dev-slack-setting.jpg" width="400">
+
+## 参考リンク
+
+Guide [Slack | Bolt for Python](https://slack.dev/bolt-python/tutorial/getting-started)
+
+Code [Bolt for Python](https://github.com/slackapi/bolt-python)
