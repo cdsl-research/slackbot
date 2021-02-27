@@ -75,6 +75,6 @@ if __name__ == "__main__":
         title="Test schdule",
         begin_date=datetime.datetime.now(),
         end_date=datetime.datetime.now() + datetime.timedelta(days=1),
-        user_email="user@example.com"
+        # user_email="user@example.com"
     )
     print(a)
