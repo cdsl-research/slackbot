@@ -318,7 +318,7 @@ def schdule_done_action(ack, body, respond, action):
                     },
                     {
                         "type": "mrkdwn",
-                        "text": f":earth_asia:*Link:*\n[Click here]({schdule_url})"
+                        "text": f":earth_asia:*Link:*\n<{schdule_url}|Google Calendar>"
                     }
                 ]
             }
