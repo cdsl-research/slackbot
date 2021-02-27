@@ -6,6 +6,7 @@ import json
 
 from slack_bolt import App
 
+import google_calendar
 import member_list
 import parser_datetime
 import tokenizer
@@ -163,10 +164,14 @@ def schdule_register_shortcut(body, ack, respond):
     except Exception:
         return
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
-    schdule_candidates = [(f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}",
-                           f"{int(dt_begin.timestamp())}"
-                           f" - {int(dt_end.timestamp())}")
-                          for dt_begin, dt_end in datetime_ranges]
+    schdule_candidates = []
+    for dt_begin, dt_end in datetime_ranges:
+        option_label = f"{fmt_dt(dt_begin)} - {fmt_dt(dt_end)}"
+        option_value = json.dumps({
+            "begin_datetime_unix": int(dt_begin.timestamp()),
+            "end_datetime_unix": int(dt_end.timestamp()),
+        })
+        schdule_candidates.append((option_label, option_value))
     respond(
         text="Schdule candidates select",
         blocks=[
@@ -188,7 +193,7 @@ def schdule_register_shortcut(body, ack, respond):
                     "placeholder": {
                         "type": "plain_text",
                         "text": "日時の候補",
-                                "emoji": True
+                        "emoji": True
                     },
                     "options": _payload_wrapper(schdule_candidates),
                     "action_id": "schdule-title-select"
@@ -203,31 +208,45 @@ def schdule_register_shortcut(body, ack, respond):
 def schdule_title_action(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
+
     try:
-        # begin_time - end_time
-        selected_value = action["selected_option"]["value"]
+        selected_value = json.loads(action["selected_option"]["value"])
         # selected_label = action["selected_option"]["text"]["text"]
         user_id = body["user"]["id"]
     except Exception:
         respond(f"Error {body}")
         return
+
     # resolve user_id into user_name
     students = member_list.get_members()
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
-    # Pickup 漢字
     user_name = result[0]["real_name"]
+    user_email = result[0]["email"]
+
+    # Pickup KANJI from username
     p = re.compile(r"[一-鿐]")
-    _user_name = "".join(p.findall(user_name))
+    kanji_name = "".join(p.findall(user_name))
+    if len(kanji_name) > 0:
+        user_name = kanji_name
+
+    # Set schdule title
     schdule_title_candidates = (
-        f"補講({_user_name})",
-        f"個別面談({_user_name})",
-        f"卒業課題MTG({_user_name})",
-        f"創成課題MTG({_user_name})",
-        f"論文チェック({_user_name})",
-        f"勉強会({_user_name})"
+        f"補講({user_name})",
+        f"個別面談({user_name})",
+        f"卒業課題MTG({user_name})",
+        f"創成課題MTG({user_name})",
+        f"論文チェック({user_name})",
+        f"勉強会({user_name})"
     )
-    _schdule_title_candidates = [
-        (x, f"{x} | {selected_value}") for x in schdule_title_candidates]
+    _schdule_title_candidates = []
+    for schdule_title in schdule_title_candidates:
+        schdule_value = json.dumps({
+            "title": schdule_title,
+            "author": user_email,
+            "begin_datetime_unix": selected_value["begin_datetime_unix"],
+            "end_datetime_unix": selected_value["end_datetime_unix"]
+        })
+        _schdule_title_candidates.append((schdule_title, schdule_value))
     respond(
         text="Schdule title select",
         blocks=[
@@ -257,11 +276,24 @@ def schdule_title_action(body, ack, respond, action):
 def schdule_done_action(ack, body, respond, action):
     assert body.get("response_url") is not None
     ack()
-    selected_value = action["selected_option"]["value"]
-    schdule_title, _schdule_date = selected_value.split(" | ")[0:2]
-    _schdule_begin, _schdule_end = _schdule_date.split(" - ")[0:2]
+
+    # Parse received values
+    selected_value = json.loads(action["selected_option"]["value"])
+    schdule_title = selected_value["title"]
+    schdule_user = selected_value["author"]
+    _schdule_begin = selected_value["begin_datetime_unix"]
+    _schdule_end = selected_value["end_datetime_unix"]
     schdule_begin = datetime.fromtimestamp(int(_schdule_begin))
     schdule_end = datetime.fromtimestamp(int(_schdule_end))
+
+    # Add google calendar
+    schdule_url = google_calendar.add(
+        title=schdule_title,
+        begin_date=schdule_begin,
+        end_date=schdule_end,
+        user_email=schdule_user
+    )
+
     respond(
         text="Schdule created",
         blocks=[
@@ -283,6 +315,14 @@ def schdule_done_action(ack, body, respond, action):
                         "type": "mrkdwn",
                         "text": (f":calendar:*Date:*\n{fmt_dt(schdule_begin)}"
                                  f" - {fmt_dt(schdule_end)}"),
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f":student:*Participans:*\n{schdule_user}"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": f":earth_asia:*Link:*\n[Click here]({schdule_url})"
                     }
                 ]
             }
