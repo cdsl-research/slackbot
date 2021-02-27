@@ -16,7 +16,12 @@ def dt_to_rfc3339(_dt: datetime) -> str:
     return _dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
 
-def add(title: str, begin_date: datetime, end_date: datetime, user_email: str) -> str:
+def add(
+    title: str,
+    begin_date: datetime,
+    end_date: datetime,
+    # user_email: str
+) -> str:
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     https://developers.google.com/calendar/quickstart/python
@@ -46,11 +51,11 @@ def add(title: str, begin_date: datetime, end_date: datetime, user_email: str) -
     event = {
         'summary': title,
         'description': "Slack Botから追加．",
-        'attendees': [
-            {
-                "email": user_email
-            }
-        ],
+        # 'attendees': [
+        #     {
+        #         "email": user_email
+        #     }
+        # ],
         'start': {
             'dateTime': dt_to_rfc3339(begin_date),
             'timeZone': 'Asia/Tokyo',  # 1985-04-12T23:20:50.52Z

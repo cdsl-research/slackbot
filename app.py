@@ -242,7 +242,7 @@ def schdule_title_action(body, ack, respond, action):
     for schdule_title in schdule_title_candidates:
         schdule_value = json.dumps({
             "title": schdule_title,
-            "author": user_email,
+            # "author": user_email,
             "begin_datetime_unix": selected_value["begin_datetime_unix"],
             "end_datetime_unix": selected_value["end_datetime_unix"]
         })
@@ -280,7 +280,7 @@ def schdule_done_action(ack, body, respond, action):
     # Parse received values
     selected_value = json.loads(action["selected_option"]["value"])
     schdule_title = selected_value["title"]
-    schdule_user = selected_value["author"]
+    # schdule_user = selected_value["author"]
     _schdule_begin = selected_value["begin_datetime_unix"]
     _schdule_end = selected_value["end_datetime_unix"]
     schdule_begin = datetime.fromtimestamp(int(_schdule_begin))
@@ -291,7 +291,7 @@ def schdule_done_action(ack, body, respond, action):
         title=schdule_title,
         begin_date=schdule_begin,
         end_date=schdule_end,
-        user_email=schdule_user
+        # user_email=schdule_user
     )
 
     respond(
@@ -318,16 +318,19 @@ def schdule_done_action(ack, body, respond, action):
                     },
                     {
                         "type": "mrkdwn",
-                        "text": f":student:*Participans:*\n{schdule_user}"
-                    },
-                    {
-                        "type": "mrkdwn",
                         "text": f":earth_asia:*Link:*\n[Click here]({schdule_url})"
                     }
                 ]
             }
         ]
     )
+
+    """
+    {
+        "type": "mrkdwn",
+        "text": f":student:*Participans:*\n{schdule_user}"
+    },
+    """
 
 
 if __name__ == "__main__":
