@@ -116,7 +116,7 @@ def fmt_dt(_dt: datetime):
 
 # 起点) [1] 書き込みに曜日や日付を含む文字列が含まれる
 @app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
-def schdule_register_message(body, say):
+def schdule_register_message(body, respond):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = []
@@ -127,7 +127,7 @@ def schdule_register_message(body, say):
             "end_datetime_unix": int(dt_end.timestamp()),
         })
         schdule_candidates.append((option_label, option_value))
-    say(
+    respond(
         text="Schdule candidates select",
         blocks=[
             {
@@ -225,7 +225,7 @@ def schdule_title_action(body, ack, respond, action):
     students = member_list.get_members()
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
     user_name = result[0]["real_name"]
-    user_email = result[0]["email"]
+    # user_email = result[0]["email"]
 
     # Pickup KANJI from username
     p = re.compile(r"[一-鿐]")
