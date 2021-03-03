@@ -115,8 +115,9 @@ def fmt_dt(_dt: datetime):
 
 
 # 起点) [1] 書き込みに曜日や日付を含む文字列が含まれる
+"""
 @app.message(re.compile(r"(?:.曜|明後|明|\d+)日"))
-def schdule_register_message(body, respond):
+def schdule_register_message(body, say):
     raw_message = body["event"]["text"]
     datetime_ranges = parser_datetime.parser_datetime(raw_message)
     schdule_candidates = []
@@ -127,7 +128,7 @@ def schdule_register_message(body, respond):
             "end_datetime_unix": int(dt_end.timestamp()),
         })
         schdule_candidates.append((option_label, option_value))
-    respond(
+    say(
         text="Schdule candidates select",
         blocks=[
             {
@@ -156,11 +157,12 @@ def schdule_register_message(body, respond):
             }
         ]
     )
+"""
 
 
 # 起点) [1] メッセージからサブメニュー経由でのBot呼び出し
-@ app.shortcut("schdule-register-shortcut")
-def schdule_register_shortcut(body, ack, respond):
+@app.shortcut("schdule-register-shortcut")
+def schdule_register_shortcut(body, ack, say):
     assert body.get("response_url") is not None
     ack()
     try:
@@ -176,7 +178,7 @@ def schdule_register_shortcut(body, ack, respond):
             "end_datetime_unix": int(dt_end.timestamp()),
         })
         schdule_candidates.append((option_label, option_value))
-    respond(
+    say(
         text="Schdule candidates select",
         blocks=[
             {
@@ -208,7 +210,7 @@ def schdule_register_shortcut(body, ack, respond):
 
 
 # [2] Botの提示したスケジュール候補が選択
-@ app.action("schdule-title-select")
+@app.action("schdule-title-select")
 def schdule_title_action(body, ack, respond, action):
     assert body.get("response_url") is not None
     ack()
@@ -276,7 +278,7 @@ def schdule_title_action(body, ack, respond, action):
 
 
 # [3] Botの予定タイトル名が選択
-@ app.action("schdule-done")
+@app.action("schdule-done")
 def schdule_done_action(ack, body, respond, action):
     assert body.get("response_url") is not None
     ack()
