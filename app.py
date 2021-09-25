@@ -5,6 +5,7 @@ import re
 import json
 
 from slack_bolt import App
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 
 import google_calendar
 import member_list
@@ -14,10 +15,11 @@ import tokenizer
 # Import the async app instead of the regular one
 # export SLACK_SIGNING_SECRET=***
 # export SLACK_BOT_TOKEN=xoxb-***
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
+#app = App(
+#    token=os.environ.get("SLACK_BOT_TOKEN"),
+#    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+#)
+app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 QR_BASE_URL = ("https://api.qrserver.com/v1/create-qr-code/"
                "?size=200%C3%97200&data=")
@@ -340,4 +342,5 @@ def schdule_done_action(ack, body, respond, action):
 
 
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+    # app.start(port=int(os.environ.get("PORT", 3000)))
+    SocketModeHandler(app, os.environ.get("SLACK_APP_TOKEN")).start()
