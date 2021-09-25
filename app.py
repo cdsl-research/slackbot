@@ -225,6 +225,7 @@ def schdule_title_action(body, ack, respond, action):
         respond(f"Error {body}")
         return
 
+    """
     # resolve user_id into user_name
     students = member_list.get_members()
     result = list(filter(lambda x: x["uid"] == user_id, students.values()))
@@ -236,7 +237,9 @@ def schdule_title_action(body, ack, respond, action):
     kanji_name = "".join(p.findall(user_name))
     if len(kanji_name) > 0:
         user_name = kanji_name
-
+    """
+    user_name = ""
+    
     # Set schdule title
     schdule_title_candidates = (
         f"補講({user_name})",
