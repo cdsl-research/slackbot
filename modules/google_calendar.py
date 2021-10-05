@@ -8,8 +8,6 @@ from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar.events'
-CAL_ID = os.environ.get("GOOGLE_CALENDAR_ID", None)
-assert CAL_ID is not None, "Fail to get GOOGLE_CALENDAR_ID"
 
 
 def dt_to_rfc3339(_dt: datetime) -> str:
@@ -20,12 +18,13 @@ def add(
     title: str,
     begin_date: datetime,
     end_date: datetime,
-    # user_email: str
+    cal_id: str = os.environ.get("GOOGLE_CALENDAR_ID", None),
 ) -> str:
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
     https://developers.google.com/calendar/quickstart/python
     """
+    assert cal_id is not None, "Fail to get GOOGLE_CALENDAR_ID"
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -67,8 +66,8 @@ def add(
             'timeZone': 'Asia/Tokyo',  # 1985-04-12T23:20:50.52Z
         },
     }
-    assert len(CAL_ID) > 20, "Invalid CAL_ID"
-    result = service.events().insert(calendarId=CAL_ID, body=event).execute()
+    assert len(cal_id) > 20, "Invalid cal_id"
+    result = service.events().insert(calendarId=cal_id, body=event).execute()
     return result.get('htmlLink')
 
 

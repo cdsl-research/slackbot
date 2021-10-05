@@ -7,10 +7,10 @@ import json
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-import google_calendar
-import member_list
-import parser_datetime
-import tokenizer
+from .modules import member_list
+from .modules import google_calendar
+from .modules import parser_datetime
+from .modules import tokenizer
 
 # Import the async app instead of the regular one
 # export SLACK_SIGNING_SECRET=***
@@ -21,12 +21,11 @@ import tokenizer
 #)
 app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
 
-QR_BASE_URL = ("https://api.qrserver.com/v1/create-qr-code/"
-               "?size=200%C3%97200&data=")
-
 
 @app.event("app_mention")
 def handle_mentions(body, say):
+    QR_BASE_URL = ("https://api.qrserver.com/v1/create-qr-code/"
+               "?size=200%C3%97200&data=")
     raw_message = body["event"]["text"]
     tokenized_message = tokenizer.tokenizer(raw_message)
     tokenized_message_types = [x.type for x in tokenized_message]
