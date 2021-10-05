@@ -7,10 +7,10 @@ import json
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from .modules import member_list
-from .modules import google_calendar
-from .modules import parser_datetime
-from .modules import tokenizer
+from modules import member_list
+from modules import google_calendar
+from modules import parser_datetime
+from modules import tokenizer
 
 # Import the async app instead of the regular one
 # export SLACK_SIGNING_SECRET=***
