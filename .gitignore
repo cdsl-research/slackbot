@@ -4,3 +4,4 @@ __pycache__/**
 mamber_list.json
 secret.json
 token.pickle
+client_secret*.json
