@@ -38,8 +38,10 @@ def add(
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            import glob
+            secret_file_name = glob.glob("*secret*.json")[0]
             flow = InstalledAppFlow.from_client_secrets_file(
-                'secret.json', SCOPES)
+                secret_file_name, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
