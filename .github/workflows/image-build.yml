@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    uses: cdsl-research/slackbot/.github/workflows/python-app.yml
+    uses: cdsl-research/slackbot/.github/workflows/python-app.yml@master
 
   push:
     needs: lint
