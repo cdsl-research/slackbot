@@ -27,7 +27,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --statistics
     - name: Lint with mypy
       run: |
-        mypy . --verbose
+        mypy .
     - name: Lint with isort
       run: |
         isort -c -v **/*.py
