@@ -7,6 +7,7 @@ on:
 
 jobs:
   push:
+    needs: lint
     runs-on: ubuntu-20.04
 
     steps:
@@ -34,4 +35,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/cdsl-research/slackbot:${{ env.DOCKER_TAG }}
-
