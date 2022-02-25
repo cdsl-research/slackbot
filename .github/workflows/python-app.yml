@@ -4,8 +4,10 @@
 name: Python application
 
 on:
-  - push
-  - workflow_call
+  push:
+    branches-ignore:
+      - "master"
+  workflow_call:
 
 jobs:
   lint:
