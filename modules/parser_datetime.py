@@ -12,8 +12,20 @@ def merge_date_time(_time: tuple, _date: tuple):
     assert len(_date) == 2, "Invalid argument _date"
     t_begin = _time[0].split(":")
     t_end = _time[1].split(":")
-    dt_begin = dt(year=_date[0][0], month=_date[0][1], day=_date[0][2], hour=int(t_begin[0]), minute=int(t_begin[1]))
-    dt_end = dt(year=_date[1][0], month=_date[1][1], day=_date[1][2], hour=int(t_end[0]), minute=int(t_end[1]))
+    dt_begin = dt(
+        year=_date[0][0],
+        month=_date[0][1],
+        day=_date[0][2],
+        hour=int(t_begin[0]),
+        minute=int(t_begin[1]),
+    )
+    dt_end = dt(
+        year=_date[1][0],
+        month=_date[1][1],
+        day=_date[1][2],
+        hour=int(t_end[0]),
+        minute=int(t_end[1]),
+    )
     return (dt_begin, dt_end)
 
 
@@ -96,7 +108,9 @@ def test():
         {"in": ("<@U01LJNE6FC7> 3月15日は研究室で発表予定なので，" "将来，外部発表する予定の学生は，参加するとよいでしょう．")},
         {
             "in": (
-                "<@U01LJNE6FC7> <@U01LJNE6FC7> <@U01LJNE6FC7> " "24日10:30-11:30で確認します．\n" "<@U01LJNE6FC7> カレンダに入れてください"
+                "<@U01LJNE6FC7> <@U01LJNE6FC7> <@U01LJNE6FC7> "
+                "24日10:30-11:30で確認します．\n"
+                "<@U01LJNE6FC7> カレンダに入れてください"
             )
         },
         {
@@ -107,7 +121,13 @@ def test():
                 "<@U01LJNE6FC7> Googleカレンダにスケジュールを入れてください．"
             )
         },
-        {"in": ("<@U01LJNE6FC7> 17日 （水）8:50-9:30で" "Googleカレンダにミーティングをスケジュールしてください．\n" "また，時間に遅れないように，早めにきてください．")},
+        {
+            "in": (
+                "<@U01LJNE6FC7> 17日 （水）8:50-9:30で"
+                "Googleカレンダにミーティングをスケジュールしてください．\n"
+                "また，時間に遅れないように，早めにきてください．"
+            )
+        },
         {
             "in": (
                 "<@U01LJNE6FC7> <@U01LJNE6FC7> <@U01LJNE6FC7> 17日（水）"
@@ -127,10 +147,18 @@ def test():
         },
         {
             "in": (
-                "<@U01LJNE6FC7> 2月10日は10:00-10:30AMで、" "テクニカルレポートの内容を確認します．\n" "<@U01LJNE6FC7> Googleカレンダに入れてもらえますか．"
+                "<@U01LJNE6FC7> 2月10日は10:00-10:30AMで、"
+                "テクニカルレポートの内容を確認します．\n"
+                "<@U01LJNE6FC7> Googleカレンダに入れてもらえますか．"
             )
         },
-        {"in": ("<@U01LJNE6FC7> 9日（火曜日）16:00-16:30に，" "論文をみるのでそれまでに原稿を更新してください．" "また，Googleカレンダに入れておいてください．")},
+        {
+            "in": (
+                "<@U01LJNE6FC7> 9日（火曜日）16:00-16:30に，"
+                "論文をみるのでそれまでに原稿を更新してください．"
+                "また，Googleカレンダに入れておいてください．"
+            )
+        },
         {"in": ("2月11日から3月22日")},
     )
     for tp in test_patterns:

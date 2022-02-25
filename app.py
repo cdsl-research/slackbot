@@ -89,7 +89,8 @@ def message_hello(message, say):
 
 def _payload_wrapper(_items):
     return [
-        {"text": {"type": "plain_text", "text": f"{label}", "emoji": True}, "value": value} for label, value in _items
+        {"text": {"type": "plain_text", "text": f"{label}", "emoji": True}, "value": value}
+        for label, value in _items
     ]
 
 
@@ -283,9 +284,15 @@ def schdule_done_action(ack, body, respond, action):
                     },
                     {
                         "type": "mrkdwn",
-                        "text": (f":calendar:*Date:*\n{fmt_dt(schdule_begin)}" f" - {fmt_dt(schdule_end)}"),
+                        "text": (
+                            f":calendar:*Date:*\n{fmt_dt(schdule_begin)}"
+                            f" - {fmt_dt(schdule_end)}"
+                        ),
                     },
-                    {"type": "mrkdwn", "text": f":earth_asia:*Link:*\n<{schdule_url}|Google Calendar>"},
+                    {
+                        "type": "mrkdwn",
+                        "text": f":earth_asia:*Link:*\n<{schdule_url}|Google Calendar>",
+                    },
                 ],
             },
         ],
