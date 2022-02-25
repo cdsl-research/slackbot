@@ -3,7 +3,10 @@ import os
 import urllib.request
 
 
-def get_members(SLACK_TOKEN: str = os.environ.get("SLACK_BOT_TOKEN"), EXCLUDE_USERS={"slackbot"}):
+def get_members(
+    SLACK_TOKEN: str | None = os.environ.get("SLACK_BOT_TOKEN"), EXCLUDE_USERS={"slackbot"}
+):
+    assert SLACK_TOKEN is not None, "Fail to get SLACK_BOT_TOKEN"
     SLACK_WEBHOOK = f"https://slack.com/api/users.list?token={SLACK_TOKEN}&pretty=1"
     assert len(SLACK_TOKEN) > 10, "Invalid Slack Token"
     response = urllib.request.urlopen(SLACK_WEBHOOK)

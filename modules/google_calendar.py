@@ -18,7 +18,7 @@ def add(
     title: str,
     begin_date: datetime,
     end_date: datetime,
-    cal_id: str = os.environ.get("GOOGLE_CALENDAR_ID", None),
+    cal_id: str | None = os.environ.get("GOOGLE_CALENDAR_ID"),
 ) -> str:
     """Shows basic usage of the Google Calendar API.
     Prints the start and name of the next 10 events on the user's calendar.
