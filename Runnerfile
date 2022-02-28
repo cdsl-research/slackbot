@@ -1,0 +1,34 @@
+NAME=cdsl-slackbot
+VER=v0.1
+
+task_fmt() {
+    isort **/*.py
+    black **/*.py --quiet
+}
+
+task_check() {
+    isort -c **/*.py
+    flake8
+    mypy **/*.py --no-error-summary
+}
+
+task_default() {
+    runner_sequence fmt check
+}
+
+task_build() {
+    docker build -t ${NAME} .
+}
+
+task_run() {
+    docker run -it --rm -p 3100:3000 --name ${NAME} ${NAME}
+}
+
+task_exec() {
+    docker exec -it ${NAME} sh
+}
+
+task_push() {
+    docker tag ${NAME} us.gcr.io/third-ridge-246401/${NAME}:${VER}
+    docker push us.gcr.io/third-ridge-246401/${NAME}:${VER}
+}
