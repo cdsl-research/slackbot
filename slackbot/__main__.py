@@ -6,7 +6,7 @@ from datetime import datetime
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-from modules import google_calendar, member_list, parser_datetime, tokenizer
+from . import google_calendar, member_list, parser_datetime, tokenizer
 
 # Import the async app instead of the regular one
 # export SLACK_SIGNING_SECRET=***
