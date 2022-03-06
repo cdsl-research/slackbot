@@ -21,7 +21,11 @@ task_build() {
 }
 
 task_run() {
-    docker run -it --rm -p 3100:3000 --name ${NAME} ${NAME}
+    docker run -it --rm -p 3100:3000 --name ${NAME} \
+    --env SLACK_BOT_TOKEN \
+    --env SLACK_APP_TOKEN \
+    --env GOOGLE_CALENDER_ID \
+    ${NAME}
 }
 
 task_exec() {
