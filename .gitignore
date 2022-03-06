@@ -1,6 +1,6 @@
 .venv/**
 env/**
-__pycache__/**
+__pycache__
 mamber_list.json
 secret.json
 token.pickle
