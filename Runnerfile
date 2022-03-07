@@ -17,7 +17,7 @@ task_default() {
 }
 
 task_build() {
-    docker build -t ${NAME} .
+    docker build --no-cache -t ${NAME} .
 }
 
 task_run() {
